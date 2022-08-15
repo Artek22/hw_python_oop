@@ -1,5 +1,7 @@
-from dataclasses import dataclass
-from typing import Sequence
+from dataclasses import dataclass, asdict
+from typing import Dict, Sequence, Any
+
+MIN_IN_HOUR = 60
 
 
 @dataclass
@@ -15,14 +17,13 @@ class InfoMessage:
     calories: float
 
     def get_message(self) -> str:
-        text_str = (
-            f'Тип тренировки: {self.training_type}; '
-            f'Длительность: {self.duration:.3f} ч.; '
-            f'Дистанция: {self.distance:.3f} км; '
-            f'Ср. скорость: {self.speed:.3f} км/ч; '
-            f'Потрачено ккал: {self.calories:.3f}.'
+        return (
+            'Тип тренировки: {training_type};'
+            'Длительность: {duration:.3f} ч;'
+            'Дистанция: {distance:.3f} км; '
+            'Ср. скорость: {speed:.3f} км/ч;'
+            'Потрачено ккал: {calories:.3f}.'.format(**asdict(self))
         )
-        return text_str
 
 
 @dataclass
@@ -46,7 +47,9 @@ class Training:
         return self.get_distance() / self.duration
 
     def get_spent_calories(self) -> float:
-        """Получить количество затраченных калорий."""
+        """Получить количество затраченных калорий.
+        Этот метод обязателен к переопределению!
+        """
         raise NotImplementedError
 
     def show_training_info(self) -> InfoMessage:
@@ -58,9 +61,6 @@ class Training:
             self.get_mean_speed(),
             self.get_spent_calories()
         )
-
-
-MIN_IN_HOUR = 60
 
 
 class Running(Training):
@@ -112,12 +112,12 @@ class Swimming(Training):
                 * self.CAL_SWM_2 * self.weight)
 
 
-def read_package(workout_type: str, data: Sequence[int]) -> Training:
+def read_package(workout_type: Any, data: Sequence[int]) -> Training:
     """Прочитать данные полученные от датчиков.
     Создаём словарь, в котором сопоставляются коды тренировок и классы,
     которые нужно вызвать для каждого типа тренировки.
     """
-    read_dict = {
+    read_dict: Dict[str, Any] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking,
@@ -138,9 +138,6 @@ if __name__ == '__main__':
         ('WLK', [9000, 1, 75, 180]),
     ]
 
-    try:
-        for workout_type, data in packages:
-            training = read_package(workout_type, data)
-            main(training)
-    except KeyError:
-        print('Неизвестный тип данных')
+    for workout_type, data in packages:
+        training = read_package(workout_type, data)
+        main(training)
