@@ -28,7 +28,7 @@ class InfoMessage:
         try:
             return self.message.format(**asdict(self))
         except Exception:
-            raise Exception('Введены ошибочные данные.')
+            raise Exception('Ошибка форматирования сообщения.')
 
 
 class Training:
@@ -127,7 +127,10 @@ def read_package(workout_type: str, data: Sequence[int]) -> Training:
         'RUN': Running,
         'WLK': SportsWalking,
     }
-    return read_dict[workout_type](*data)
+    try:
+        return read_dict[workout_type](*data)
+    except Exception:
+        raise Exception('Неизвестный тип тренеровки.')
 
 
 def main(training: Training) -> None:
@@ -144,8 +147,5 @@ if __name__ == '__main__':
     ]
 
     for workout_type, data in packages:
-        try:
-            training = read_package(workout_type, data)
-        except Exception:
-            raise Exception('Введены ошибочные данные.')
+        training = read_package(workout_type, data)
         main(training)
