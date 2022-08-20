@@ -117,7 +117,7 @@ class Swimming(Training):
                 * self.CAL_SWM_2 * self.weight)
 
 
-def read_package(workout_type: str, data: Sequence[int]) -> Training:
+def read_package(workout_type: str, data_: Sequence[int]) -> Training:
     """Прочитать данные полученные от датчиков.
     Создаём словарь, в котором сопоставляются коды тренировок и классы,
     которые нужно вызвать для каждого типа тренировки.
@@ -128,14 +128,14 @@ def read_package(workout_type: str, data: Sequence[int]) -> Training:
         'WLK': SportsWalking,
     }
     try:
-        return read_dict[workout_type](*data)
+        return read_dict[workout_type](*data_)
     except Exception:
         raise Exception('Неизвестный тип тренеровки.')
 
 
-def main(training: Training) -> None:
+def main(training_: Training) -> None:
     """Главная функция."""
-    info = training.show_training_info()
+    info = training_.show_training_info()
     print(info.get_message())
 
 
@@ -146,6 +146,6 @@ if __name__ == '__main__':
         ('WLK', [9000, 1, 75, 180]),
     ]
 
-    for workout_type, data in packages:
-        training = read_package(workout_type, data)
+    for workout_type_, data in packages:
+        training = read_package(workout_type_, data)
         main(training)
